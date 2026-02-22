@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "description": "Current conversation session id",
+      "type": "string"
+    },
+    "userDetails": {
+      "type": "object",
+      "required": [
+        "name",
+        "date",
+        "time",
+        "title"
+      ],
+      "properties": {
+        "date": {
+          "description": "Meeting date in YYYY-MM-DD format",
+          "type": "string"
+        },
+        "name": {
+          "description": "Person name",
+          "type": "string"
+        },
+        "time": {
+          "description": "24 hour time HH:MM",
+          "type": "string"
+        },
+        "title": {
+          "description": "Meeting title",
+          "type": "string"
+        },
+        "duration": {
+          "description": "Meeting duration in minutes as integer string",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "sessionId",
+    "userDetails"
+  ]
+}

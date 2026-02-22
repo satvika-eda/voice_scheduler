@@ -1,0 +1,9 @@
+{
+  "name": "voice-scheduling_agent",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "uvicorn backend.main:app --reload --port 3001",
+    "frontend": "cd frontend && npm run dev"
+  }
+}
