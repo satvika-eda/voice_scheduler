@@ -2,12 +2,65 @@
 
 A voice-powered meeting scheduler that uses Vapi AI for voice interaction and Google Calendar for event creation.
 
+## Live Demo
+
+**Demo Video:** https://www.loom.com/share/465193776c4a424facda3c6448b5152f
+
+**Frontend:** https://voice-frontend-n5gsv6o6eq-nn.a.run.app
+
+**Backend API:** https://voice-backend-n5gsv6o6eq-nn.a.run.app
+
+### How to Test
+
+1. Open the frontend URL in Chrome
+2. Click the microphone button to start a conversation
+4. The agent will ask clarifying questions about duration, title, etc.
+5. Confirm the details when prompted
+6. The event will be created in Google Calendar
+
+
 ## Features
 
 - **Voice-first interface** - Schedule meetings by talking naturally
 - **Google Calendar integration** - Events created directly in your calendar
 - **AI-powered** - Uses OpenAI for natural language understanding
 - **Cloud-ready** - Deploy to Google Cloud Run
+
+---
+
+## Calendar Integration
+
+### How It Works
+
+The calendar integration uses a **Google Cloud Service Account** for server-to-server authentication. This approach eliminates the need for users to go through OAuth flows.
+
+**Flow:**
+1. User speaks meeting details (name, date, time, duration, title)
+2. Vapi AI extracts structured data via tool calls
+3. Frontend sends event data to backend API
+4. Backend uses service account credentials to authenticate with Google Calendar API
+5. Event is created in the configured calendar
+6. Calendar invite is sent to the specified attendee email
+
+**Key components:**
+
+- [backend/calendar_providers/auth.py](backend/calendar_providers/auth.py) - Handles service account authentication
+- [backend/calendar_providers/google_calendar.py](backend/calendar_providers/google_calendar.py) - Creates calendar events
+- [backend/api/routes.py](backend/api/routes.py) - API endpoint `/api/calendar/create`
+
+**Service Account Setup:**
+1. Create a service account in Google Cloud Console
+2. Download the JSON key file
+3. Share your Google Calendar with the service account email (grant "Make changes to events" permission)
+4. The service account can now create events on your behalf
+
+**Why Service Account over OAuth?**
+- No user login required - simpler UX for voice-first interaction
+- Server-side authentication - more secure, credentials never exposed to client
+- Works for demo/single-calendar use cases
+- OAuth flow is also supported for multi-user scenarios
+
+---
 
 ## Architecture
 
@@ -25,7 +78,9 @@ A voice-powered meeting scheduler that uses Vapi AI for voice interaction and Go
 └─────────────┘     └─────────────┘
 ```
 
-## Quick Start
+---
+
+## Run Locally (Optional)
 
 ### Prerequisites
 
@@ -249,18 +304,30 @@ gcloud run services describe voice-frontend --region <REGION>
 ```
 voice_scheduling_agent/
 ├── backend/
-│   ├── api/routes.py         # API endpoints
-│   ├── calendar_providers/   # Google Calendar integration
-│   ├── utils/                # Helpers (datetime, text parsing)
-│   ├── main.py               # FastAPI app
-│   └── deploy.sh             # Cloud Run deployment
+│   ├── api/routes.py              # API endpoints
+│   ├── calendar_providers/
+│   │   ├── auth.py                # Service account authentication
+│   │   └── google_calendar.py     # Calendar event creation
+│   ├── utils/                     # Helpers (datetime, text parsing)
+│   ├── main.py                    # FastAPI app entry point
+│   ├── deploy.sh                  # Cloud Run deployment script
+│   └── tests/                     # API and calendar tests
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   └── VoiceAgent.jsx  # Main voice UI
-│   │   └── services/api.js     # Backend API client
-│   └── deploy.sh               # Cloud Run deployment
-├── vapi_config/              # Vapi assistant configuration
-└── docs/                     # Architecture docs
+│   │   │   └── VoiceAgent.jsx     # Main voice UI component
+│   │   └── services/api.js        # Backend API client
+│   ├── deploy.sh                  # Cloud Run deployment script
+│   └── vite.config.js             # Vite configuration
+├── vapi_config/                   # Vapi assistant configuration
+└── docs/                          # Architecture documentation
 ```
 
+## Tech Stack
+
+- **Frontend:** React + Vite + Vapi Web SDK
+- **Backend:** Python + FastAPI + Uvicorn
+- **Voice AI:** Vapi.ai
+- **LLM:** OpenAI GPT-3.5-turbo
+- **Calendar:** Google Calendar API
+- **Deployment:** Google Cloud Run
